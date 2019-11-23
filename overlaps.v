@@ -48,56 +48,31 @@ Theorem overlaps_Teradata_BigQuery_equiv : forall p1 p2 : period,
     overlapsTeradataR p1 p2 <-> overlapsBigQueryR p1 p2.
 Proof.  
   split.
-  - intros.
-    induction H.
-    * inversion H. inversion H0. subst.
-      apply BigQuery.
-      assumption. assumption.
-      rewrite max_l.
-      apply Decidable.not_and in H2.
-      destruct H2 as [HQ1 | HQ2].
-      apply not_le in HQ1.
-      (* Want to be able to say min will give us e1 or e2, without
-         claiming WHICH one b/c we don't know enough to prove either way. *)
-      apply Nat.min_glb_lt. assumption. assumption.
-      rewrite min_l.
-      apply not_ge in HQ2.
-      assumption. rewrite Nat.lt_eq_cases.
-      apply not_ge in HQ2.
-      left. assumption.
-      apply Nat.le_decidable.  
-      apply Decidable.not_and in H2.
-      destruct H2 as [HQ1 | HQ2].
-      apply not_ge in HQ1. 
-      rewrite Nat.lt_eq_cases.
-      left. assumption.
-      apply not_ge in HQ2.
-      rewrite Nat.lt_eq_cases.
-      left. assumption.
-      apply dec_ge.
-    * inversion H. inversion H0. subst.
-      apply BigQuery.
-      assumption. assumption.
-      rewrite max_r.
-      apply Decidable.not_and in H2.
-      destruct H2 as [HQ1 | HQ2].
-      apply not_ge in HQ1.
-      (* Same as above; we don't know which of the two is actually min.*)
-      apply Nat.min_glb_lt. assumption. assumption.
-      rewrite min_r.
-      assumption.
-      rewrite Nat.lt_eq_cases.
-      apply not_ge in HQ2.
-      left. assumption.
-      apply dec_ge.
-      rewrite Nat.lt_eq_cases.
-      left. assumption.
-    * inversion H. inversion H0. subst.
-      apply BigQuery. destruct H2 as [HQ1 | HQ2].
-      assumption. assumption. assumption.
-      rewrite max_r.
-      rewrite H1 in H3. apply Nat.min_glb_lt. assumption. assumption.
-      rewrite Nat.lt_eq_cases. right. assumption.
+  - intros H.
+    induction H; inversion H; inversion H0; subst; apply BigQuery; repeat assumption;
+      try (apply Decidable.not_and in H2; try apply dec_ge);
+      destruct H2 as [|].
+      * rewrite max_l.
+        + apply not_le in H2. apply Nat.min_glb_lt; assumption.
+        + apply not_ge in H2. rewrite Nat.lt_eq_cases. left. assumption.
+      * rewrite min_l; apply not_ge in H2.
+        + rewrite max_l. assumption.
+          rewrite Nat.lt_eq_cases. left. assumption.
+        + rewrite Nat.lt_eq_cases. left. assumption.
+      * rewrite max_r.
+        + apply not_ge in H2. apply Nat.min_glb_lt; assumption.
+        + rewrite Nat.lt_eq_cases. left. assumption.
+      * rewrite max_r.
+        + rewrite min_r. assumption.
+          rewrite Nat.lt_eq_cases. apply not_ge in H2. left. assumption.
+        + rewrite Nat.lt_eq_cases. left. assumption.
+      * rewrite max_r.
+        + rewrite min_r. assumption.
+          rewrite Nat.lt_eq_cases. right. symmetry. assumption.
+        + rewrite Nat.lt_eq_cases. right. assumption.
+      * rewrite max_r.
+        + rewrite H1 in H3. apply Nat.min_glb_lt; assumption.
+        + rewrite Nat.lt_eq_cases. right. assumption.
   - intros.
     inversion H. subst.
     apply Nat.max_lub_lt_iff in H2.
